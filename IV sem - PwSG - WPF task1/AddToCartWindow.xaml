@@ -1,0 +1,33 @@
+﻿<Window x:Class="IV_sem___PwSG___WPF_task1.AddToCartWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:IV_sem___PwSG___WPF_task1"
+        mc:Ignorable="d"
+        Title="AddToCartWindow" Height="200" Width="300">
+    <Window.Resources>
+        
+    </Window.Resources>
+    
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+           <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <TextBlock Text="Name of product: " FontWeight="Bold" VerticalAlignment="Center"/>
+        <TextBlock Text="Count: " FontWeight="Bold" VerticalAlignment="Center" Grid.Row="1"/>
+        <Button Content="Add to cart" Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center"
+                Width="80" Height="30" Margin="5" Click="AddToCartButton_Click"/>
+        <TextBlock Name="NameOfProductBox" Grid.Column="1" VerticalAlignment="Center"/>
+        <TextBox Text="1" Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Left"
+                 Width="120" Height="25" Margin="5" Name="CountBox"/>
+        <Button Content="Cancel" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center"
+                Width="80" Height="30" Margin="5" Click="CancelButton_Click"/>
+    </Grid>
+</Window>

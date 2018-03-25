@@ -1,0 +1,268 @@
+﻿<Window x:Class="IV_sem___PwSG___WPF_task1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:IV_sem___PwSG___WPF_task1"
+        x:Name="Self"
+        DataContext="{Binding ElementName=Self}"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="600" Width="800"
+        MinHeight="500" MinWidth="500">
+    <Window.Resources>
+        <CollectionViewSource x:Key="itemList" Source="{Binding itemList}" />
+        <CollectionViewSource x:Key="cartList" Source="{Binding cartList}" />
+        <BitmapImage x:Key="AddToCartIcon" UriSource="pack://application:,,,/Resources/addtocart.png" />
+        <BitmapImage x:Key="PlusIcon" UriSource="pack://application:,,,/Resources/plus.png" />
+        <BitmapImage x:Key="MinusIcon" UriSource="pack://application:,,,/Resources/minus.png" />
+        <BitmapImage x:Key="RemoveFromCartIcon" UriSource="pack://application:,,,/Resources/removeFromCart.png" />
+        <DataTemplate x:Key="MyItemTemplate">
+            <Grid HorizontalAlignment="Stretch"
+                  Width="{Binding VievportWidth, Mode=TwoWay, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListView}}}"
+                  Margin="4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition MinWidth="400" Width="8*"/>
+                    <ColumnDefinition MinWidth="100" Width="2*"/>
+                    <ColumnDefinition Width="75"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="{Binding Name}" Grid.Column="0" Grid.Row="0"
+                           FontSize="18" FontFamily="Arial"></TextBlock>
+                <TextBlock Text="{Binding Description}" Grid.Column="0" Grid.Row="1"
+                           FontSize="14" FontFamily="Arial"></TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="2" FontSize="12" FontFamily="Arial">
+                    Categroy: 
+                <TextBlock Text="{Binding Category}" 
+                           FontSize="12" FontFamily="Arial"></TextBlock>
+                </TextBlock>
+                <TextBlock Grid.Column="1" Grid.Row="1" Grid.RowSpan="3" VerticalAlignment="Center">
+                <TextBlock Text="{Binding Price, StringFormat=N2}" />
+                    $
+                </TextBlock>
+                <Button Grid.Column="2" Grid.Row="1" Width="Auto" Height="Auto"
+                        Click="AddToCartButton_Click" Tag="{Binding}">
+                    <Image Source="{StaticResource AddToCartIcon}" />
+                </Button>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="MyCartItemTemplate">
+            <Grid HorizontalAlignment="Stretch"
+                  Width="{Binding ViewportWidth, Mode=TwoWay, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
+                  Margin="4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <DockPanel>
+                    <TextBlock Text="{Binding item.Name}" FontWeight="Bold" DockPanel.Dock="Top"/>
+                    <TextBlock DockPanel.Dock="Bottom">
+                        Price per unit: 
+                        <TextBlock Text="{Binding item.Price}" />
+                         $
+                    </TextBlock>
+                </DockPanel>
+                <Grid Grid.Column="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="75" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock VerticalAlignment="Center">
+                        Count: 
+                        <TextBlock Text="{Binding Counter, Mode=TwoWay}"/>
+                    </TextBlock>
+                    <DockPanel Grid.Column="1" VerticalAlignment="Stretch">
+                        <Button Width="30" Height="30" VerticalAlignment="Top" Margin="2"
+                                DockPanel.Dock="Top" Click="PlusButton_Click"
+                                Tag="{Binding}">
+                            <Image Source="{StaticResource PlusIcon}" />
+                        </Button>
+                        <Button Width="30" Height="30" VerticalAlignment="Bottom" Margin="2"
+                                DockPanel.Dock="Bottom" Click="MinusButton_Click"
+                                Tag="{Binding}">
+                            <Image Source="{StaticResource MinusIcon}" />
+                        </Button>
+                    </DockPanel>
+                    <Button Width="Auto" Height="Auto" Grid.Column="2">
+                        <Image Source="{StaticResource RemoveFromCartIcon}" />
+                    </Button>
+                </Grid>
+            </Grid>
+        </DataTemplate>
+        <Style x:Key="alternatingListViewItemStyle" TargetType="{x:Type ListViewItem}">
+            <Style.Triggers>
+                <!-- setting up triggers for alternate background colors -->
+                <Trigger Property="ItemsControl.AlternationIndex" Value="0">
+                    <Setter Property="Background" Value="#FF4C85FF"></Setter>
+                </Trigger>
+                <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                    <Setter Property="Background" Value="#FFFF8C7C"></Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <ObjectDataProvider x:Key="categoryFromEnum"
+                            MethodName="GetValues" 
+                            ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="local:Category"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <Style x:Key="WarehouseCellStyle" TargetType="TextBox">
+            <Style.Triggers>
+                <Trigger Property="IsFocused" Value="True">
+                    <Setter Property="IsReadOnly" Value="False" />
+                </Trigger>
+                <Trigger Property="IsFocused" Value="False">
+                    <Setter Property="IsReadOnly" Value="True" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <RadialGradientBrush x:Key="backgroundBrush"
+                            GradientOrigin="0.5,0.5"
+                            Center="0.5,0.5" 
+                            RadiusX="0.5" RadiusY="0.5">
+            <RadialGradientBrush.GradientStops>
+                <GradientStop Color="#FFFFBD7C" Offset="0" />
+                <GradientStop Color="#FFd1FF8C" Offset="1.0" />
+            </RadialGradientBrush.GradientStops>
+        </RadialGradientBrush>
+        <LinearGradientBrush x:Key="menuBackgroundBrush"
+            StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Color="#FF41BBCF" Offset="0" />
+            <GradientStop Color="#FFCEF8FF" Offset="1.0" />
+        </LinearGradientBrush>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Menu Grid.Column="0" Grid.Row="0">
+            <MenuItem Header="File">
+                <MenuItem Header="Load" Click="LoadMenuItem_Click"/>
+                <MenuItem Header="Save" Click="SaveMenuItem_Click"/>
+                <Separator/>
+                <MenuItem Header="Exit" Click="ExitMenuItem_Click"/>
+            </MenuItem>
+            <MenuItem Header="Products">
+                <MenuItem Header="Add products" Click="AddProductMenuItem_Click"/>
+                <MenuItem Header="Clear products" Click="ClearProductsMenuItem_Click" />
+            </MenuItem>
+            <MenuItem Header="About" Click="AboutMenuItem_Click"/>
+        </Menu>
+        
+        <TabControl Grid.Column="0" Grid.Row="1">
+            <TabItem Header="Shop">
+                <Grid Background="{StaticResource backgroundBrush}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="225"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid Margin="5" Background="{StaticResource menuBackgroundBrush}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="2*" />
+                        </Grid.RowDefinitions>
+
+                        <DockPanel Margin="5">
+                            <TextBlock Text="Search" FontWeight="Bold" FontSize="18" HorizontalAlignment="Center"
+                                       Margin="0,15,0,25" DockPanel.Dock="Top"/>
+                            <CheckBox Content="By name" Margin="3" HorizontalAlignment="Left" DockPanel.Dock="Top"
+                                      Click="ByNameCheckBox_Click" Name="nameCheckBox"/>
+                            <TextBox Name="byNameTextBox" HorizontalAlignment="Stretch" Height="25" DockPanel.Dock="Top"
+                                     IsEnabled="False"/>
+                        </DockPanel>
+                        <Separator Grid.Row="1" Margin="5"/>
+                        <DockPanel Margin="5" Grid.Row="2">
+                            <CheckBox Content="By price" Margin="3,10,0,0" HorizontalAlignment="Left" DockPanel.Dock="Top"
+                                      Click="ByPriceCheckBox_Click" Name="priceCheckBox"/>
+                            <DockPanel Margin="5" DockPanel.Dock="Top" LastChildFill="False">
+                                <TextBlock Text="From:" DockPanel.Dock="Left" Height="20"/>
+                                <TextBox Name="fromTextBox" Text="0" DockPanel.Dock="Right" Height="25" Width="100"
+                                         IsEnabled="False"/>
+                            </DockPanel>
+                            <DockPanel Margin="5" DockPanel.Dock="Top" LastChildFill="False">
+                                <TextBlock Text="To:" DockPanel.Dock="Left" Height="20"/>
+                                <TextBox Name="toTextBox" Text="10000" DockPanel.Dock="Right" Height="25" Width="100"
+                                         IsEnabled="False"/>
+                            </DockPanel>
+                        </DockPanel>
+                        <Separator Grid.Row="3" Margin="5"/>
+                        <DockPanel Margin="5" Grid.Row="4" LastChildFill="False">
+                            <CheckBox Content="By category" Margin="3,10,0,0" HorizontalAlignment="Left" DockPanel.Dock="Top"
+                                      Click="ByCategoryCheckBox_Click" Name="categoryCheckBox"/>
+                            <ComboBox Name="byCategoryComboBox" ItemsSource="{Binding Source={StaticResource categoryFromEnum}}" 
+                                      HorizontalAlignment="Stretch" DockPanel.Dock="Top"
+                                      Margin="3,10" IsEnabled="False"/>
+                            <Button Content="Search" DockPanel.Dock="Top" HorizontalAlignment="Center"
+                                    Width="125" Height="25" Margin="0,5" Click="searchButton_Click"/>
+                            <Button Content="Show All" DockPanel.Dock="Top" HorizontalAlignment="Center"
+                                    Width="125" Height="25" Margin="0,5"
+                                    Click="ShowAllButton_Click"/>
+                        </DockPanel>
+                    </Grid>
+                    <ListView Name="ShopListView" Grid.Column="1"
+                              ItemsSource="{Binding}"
+                              DataContext="{StaticResource itemList}"
+                              ItemTemplate="{StaticResource MyItemTemplate}"
+                              ItemContainerStyle="{StaticResource alternatingListViewItemStyle}"
+                              AlternationCount="2"
+                              ScrollViewer.CanContentScroll="True"
+                              HorizontalAlignment="Stretch"
+                              HorizontalContentAlignment="Stretch"
+                              Margin="5"
+                              />
+                </Grid>
+            </TabItem>
+            <TabItem Header="Warehouse">
+                <Grid>
+                    <DataGrid Name="WarehouseDataGrid" Background="{StaticResource backgroundBrush}"
+                              ItemsSource="{Binding itemList}" IsReadOnly="False"
+                              AutoGenerateColumns="False" CanUserAddRows="True" CanUserDeleteRows="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Name" Width="SizeToCells"
+                                                Binding="{Binding Name}" IsReadOnly="False"/>
+                            <DataGridTextColumn Header="Description" Width="SizeToCells"
+                                                Binding="{Binding Description}" IsReadOnly="False"/>
+                            <DataGridTextColumn Header="Price" Width="SizeToCells"
+                                                Binding="{Binding Price, StringFormat=N2}" IsReadOnly="False"/>
+                            <DataGridComboBoxColumn Header="Category" Width="SizeToCells"
+                                                    SelectedItemBinding="{Binding Category}"
+                                                    ItemsSource="{Binding Source={StaticResource categoryFromEnum}}"/>
+                        </DataGrid.Columns>
+
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Cart">
+                <ListView Name="CartListView" Grid.Column="1"
+                              ItemsSource="{Binding}"
+                              DataContext="{StaticResource cartList}"
+                              ItemTemplate="{StaticResource MyCartItemTemplate}"
+                              ScrollViewer.CanContentScroll="True"
+                              ItemContainerStyle="{StaticResource alternatingListViewItemStyle}"
+                              AlternationCount="2"
+                              HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Stretch"
+                              Margin="5"
+                              Background="{StaticResource backgroundBrush}"
+                              />
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>
